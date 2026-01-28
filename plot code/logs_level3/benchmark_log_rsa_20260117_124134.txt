@@ -1,0 +1,77 @@
+Logging output to: rsa/benchmark_log_rsa_20260117_124134.txt
+🚀 Starting Power Consumption Benchmark for rsa-7680 🚀
+
+============== System Information ==============
+Algorithm:              rsa-7680
+Benchmark Duration:     60 seconds
+Process Priority:       SCHED_FIFO (real-time)
+================================================
+
+Validating RAPL domains...
+✓ RAPL domains validated.
+
+--- ⚙️ Prepare Test Data ---
+Generating RSA-7680 keypair...
+✓ Generated RSA-7680 keypair (PSS padding, SHA-384) and 1000 random messages.
+OpenSSL version: OpenSSL 3.0.13 30 Jan 2024
+Pre-computing 1000 signatures for verification benchmark...
+✓ Pre-computed 1000 signatures.
+
+--- ✏️ Signing Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 49.0°C → 42.0°C
+Starting signing warmup phase (240 seconds)...
+✓ signing warmup completed (3870 ops). Temp: 42.0°C → 52.0°C (Δ10.0°C)
+Starting RSA signing benchmark (60 seconds)...
+✓ signing benchmark completed. Throughput: 16.05 ops/sec
+
+--- ✔️ Verification Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 53.0°C → 45.0°C
+Starting verification warmup phase (240 seconds)...
+✓ verification warmup completed (615730 ops). Temp: 45.0°C → 54.0°C (Δ9.0°C)
+Starting RSA verification benchmark (60 seconds)...
+✓ verification benchmark completed. Throughput: 2559.05 ops/sec
+
+--- 💤 Measure Idle Baseline ---
+Cooling down system for 240 seconds... done. Temp: 54.0°C → 44.0°C
+Measuring idle baseline energy consumption (60 seconds)...
+✓ Idle baseline completed. Avg CPU Power: 2.82 W, Avg Cores Power: 0.67 W
+
+--- 📊 Data Analysis ---
+
+======================= BENCHMARK RESULTS (rsa-7680) =======================
+
+Performance Metrics:
+   - Signing:      963 ops in 60.02s -> 16.05 ops/sec
+   - Verification: 153544 ops in 60.00s -> 2559.05 ops/sec
+   - Ratio (Verify/Sign): 159.48x
+
+Raw Energy Metrics (Total):
+   - Signing (CPU):      345.42 J total, 358.691 mJ/op
+   - Verification (CPU): 339.98 J total, 2.214 mJ/op
+   - Idle (CPU):         169.07 J total (2.82 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Package, Idle-Subtracted):
+   - Signing:      183.079 mJ/op
+   - Verification: 1.113 mJ/op
+   - Energy Ratio (Sign/Verify): 164.48x
+
+Cores Energy Metrics:
+   - Signing (Cores):      210.33 J total, 218.415 mJ/op
+   - Verification (Cores): 207.49 J total, 1.351 mJ/op
+   - Idle (Cores):         40.31 J total (0.67 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Cores, Idle-Subtracted):
+   - Signing:      176.542 mJ/op
+   - Verification: 1.089 mJ/op
+   - Energy Ratio (Sign/Verify): 162.15x
+
+Output Files:
+   - Signing:      rsa/rsa_RSA_signing_20260117_125203.csv
+   - Verification: rsa/rsa_RSA_verification_20260117_130103.csv
+   - Idle:         rsa/rsa_RSA_idle_20260117_130603.csv
+====================================================================================
+
+Cleaning up resources...
+
+✅ Benchmark Complete.
+Log file closed.

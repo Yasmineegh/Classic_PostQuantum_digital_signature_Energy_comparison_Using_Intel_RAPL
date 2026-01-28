@@ -1,0 +1,76 @@
+Logging output to: falcon/benchmark_log_falcon_20260115_173519.txt
+🚀 Starting Power Consumption Benchmark for falcon-Falcon-512 🚀
+
+============== System Information ==============
+Algorithm:              falcon-Falcon-512
+Benchmark Duration:     60 seconds
+Process Priority:       SCHED_FIFO (real-time)
+================================================
+
+Validating RAPL domains...
+✓ RAPL domains validated.
+
+--- ⚙️ Prepare Test Data ---
+Generating keypair for Falcon-512...
+✓ Generated Falcon-512 keypair (SHAKE256) and 1000 random messages.
+Pre-computing 1000 signatures for verification benchmark...
+✓ Pre-computed 1000 signatures.
+
+--- ✏️ Signing Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 47.0°C → 43.0°C
+Starting signing warmup phase (240 seconds)...
+✓ signing warmup completed (722422 ops). Temp: 43.0°C → 54.0°C (Δ11.0°C)
+Starting Falcon-512 signing benchmark (60 seconds)...
+✓ signing benchmark completed. Throughput: 2969.15 ops/sec
+
+--- ✔️ Verification Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 50.0°C → 43.0°C
+Starting verification warmup phase (240 seconds)...
+✓ verification warmup completed (3540287 ops). Temp: 43.0°C → 53.0°C (Δ10.0°C)
+Starting Falcon-512 verification benchmark (60 seconds)...
+✓ verification benchmark completed. Throughput: 14680.56 ops/sec
+
+--- 💤 Measure Idle Baseline ---
+Cooling down system for 240 seconds... done. Temp: 54.0°C → 45.0°C
+Measuring idle baseline energy consumption (60 seconds)...
+✓ Idle baseline completed. Avg CPU Power: 2.85 W, Avg Cores Power: 0.66 W
+
+--- 📊 Data Analysis ---
+
+======================= BENCHMARK RESULTS (falcon-Falcon-512) =======================
+
+Performance Metrics:
+   - Signing:      178150 ops in 60.00s -> 2969.15 ops/sec
+   - Verification: 880835 ops in 60.00s -> 14680.56 ops/sec
+   - Ratio (Verify/Sign): 4.94x
+
+Raw Energy Metrics (Total):
+   - Signing (CPU):      356.71 J total, 2.002 mJ/op
+   - Verification (CPU): 337.89 J total, 0.384 mJ/op
+   - Idle (CPU):         171.19 J total (2.85 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Package, Idle-Subtracted):
+   - Signing:      1.042 mJ/op
+   - Verification: 0.189 mJ/op
+   - Energy Ratio (Sign/Verify): 5.50x
+
+Cores Energy Metrics:
+   - Signing (Cores):      224.05 J total, 1.258 mJ/op
+   - Verification (Cores): 204.23 J total, 0.232 mJ/op
+   - Idle (Cores):         39.56 J total (0.66 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Cores, Idle-Subtracted):
+   - Signing:      1.036 mJ/op
+   - Verification: 0.187 mJ/op
+   - Energy Ratio (Sign/Verify): 5.54x
+
+Output Files:
+   - Signing:      falcon/falcon_Falcon-512_signing_20260115_174419.csv
+   - Verification: falcon/falcon_Falcon-512_verification_20260115_175319.csv
+   - Idle:         falcon/falcon_Falcon-512_idle_20260115_175819.csv
+====================================================================================
+
+Cleaning up resources...
+
+✅ Benchmark Complete.
+Log file closed.

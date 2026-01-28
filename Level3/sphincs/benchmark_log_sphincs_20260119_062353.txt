@@ -1,0 +1,76 @@
+Logging output to: sphincs/benchmark_log_sphincs_20260119_062353.txt
+🚀 Starting Power Consumption Benchmark for sphincs-SPHINCS+-SHA2-192s-simple 🚀
+
+============== System Information ==============
+Algorithm:              sphincs-SPHINCS+-SHA2-192s-simple
+Benchmark Duration:     60 seconds
+Process Priority:       SCHED_FIFO (real-time)
+================================================
+
+Validating RAPL domains...
+✓ RAPL domains validated.
+
+--- ⚙️ Prepare Test Data ---
+Generating keypair for SPHINCS+-SHA2-192s-simple...
+✓ Generated SPHINCS+-SHA2-192s-simple keypair (hash: SHA-256) and 1000 random messages.
+Pre-computing 1000 signatures for verification benchmark...
+✓ Pre-computed 1000 signatures.
+
+--- ✏️ Signing Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 46.0°C → 43.0°C
+Starting signing warmup phase (240 seconds)...
+✓ signing warmup completed (479 ops). Temp: 43.0°C → 53.0°C (Δ10.0°C)
+Starting SPHINCS+-SHA2-192s signing benchmark (60 seconds)...
+✓ signing benchmark completed. Throughput: 1.98 ops/sec
+
+--- ✔️ Verification Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 52.0°C → 42.0°C
+Starting verification warmup phase (240 seconds)...
+✓ verification warmup completed (377060 ops). Temp: 42.0°C → 54.0°C (Δ12.0°C)
+Starting SPHINCS+-SHA2-192s verification benchmark (60 seconds)...
+✓ verification benchmark completed. Throughput: 1566.58 ops/sec
+
+--- 💤 Measure Idle Baseline ---
+Cooling down system for 240 seconds... done. Temp: 46.0°C → 43.0°C
+Measuring idle baseline energy consumption (60 seconds)...
+✓ Idle baseline completed. Avg CPU Power: 2.68 W, Avg Cores Power: 0.68 W
+
+--- 📊 Data Analysis ---
+
+======================= BENCHMARK RESULTS (sphincs-SPHINCS+-SHA2-192s-simple) =======================
+
+Performance Metrics:
+   - Signing:      119 ops in 60.11s -> 1.98 ops/sec
+   - Verification: 93995 ops in 60.00s -> 1566.58 ops/sec
+   - Ratio (Verify/Sign): 791.33x
+
+Raw Energy Metrics (Total):
+   - Signing (CPU):      360.67 J total, 3030.814 mJ/op
+   - Verification (CPU): 353.65 J total, 3.762 mJ/op
+   - Idle (CPU):         160.73 J total (2.68 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Package, Idle-Subtracted):
+   - Signing:      1677.859 mJ/op
+   - Verification: 2.053 mJ/op
+   - Energy Ratio (Sign/Verify): 817.38x
+
+Cores Energy Metrics:
+   - Signing (Cores):      231.13 J total, 1942.306 mJ/op
+   - Verification (Cores): 226.40 J total, 2.409 mJ/op
+   - Idle (Cores):         40.72 J total (0.68 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Cores, Idle-Subtracted):
+   - Signing:      1599.550 mJ/op
+   - Verification: 1.975 mJ/op
+   - Energy Ratio (Sign/Verify): 809.70x
+
+Output Files:
+   - Signing:      sphincs/sphincs_SPHINCS+-SHA2-192s_signing_20260119_064116.csv
+   - Verification: sphincs/sphincs_SPHINCS+-SHA2-192s_verification_20260119_065016.csv
+   - Idle:         sphincs/sphincs_SPHINCS+-SHA2-192s_idle_20260119_065516.csv
+====================================================================================
+
+Cleaning up resources...
+
+✅ Benchmark Complete.
+Log file closed.

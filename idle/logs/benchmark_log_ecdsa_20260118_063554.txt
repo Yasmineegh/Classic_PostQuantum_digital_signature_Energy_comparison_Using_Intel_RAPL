@@ -1,0 +1,77 @@
+Logging output to: ecdsa/benchmark_log_ecdsa_20260118_063554.txt
+🚀 Starting Power Consumption Benchmark for ecdsa-P-384 🚀
+
+============== System Information ==============
+Algorithm:              ecdsa-P-384
+Benchmark Duration:     60 seconds
+Process Priority:       SCHED_FIFO (real-time)
+================================================
+
+Validating RAPL domains...
+✓ RAPL domains validated.
+
+--- ⚙️ Prepare Test Data ---
+Generating ECDSA keypair for curve P-384...
+✓ Generated ECDSA keypair (curve: P-384, SHA-384) and 1000 random messages.
+OpenSSL version: OpenSSL 3.0.13 30 Jan 2024
+Pre-computing 1000 signatures for verification benchmark...
+✓ Pre-computed 1000 signatures.
+
+--- ✏️ Signing Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 46.0°C → 41.0°C
+Starting signing warmup phase (240 seconds)...
+✓ signing warmup completed (216256 ops). Temp: 41.0°C → 54.0°C (Δ13.0°C)
+Starting ECDSA signing benchmark (60 seconds)...
+✓ signing benchmark completed. Throughput: 898.70 ops/sec
+
+--- ✔️ Verification Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 53.0°C → 43.0°C
+Starting verification warmup phase (240 seconds)...
+✓ verification warmup completed (247447 ops). Temp: 43.0°C → 53.0°C (Δ10.0°C)
+Starting ECDSA verification benchmark (60 seconds)...
+✓ verification benchmark completed. Throughput: 1026.69 ops/sec
+
+--- 💤 Measure Idle Baseline ---
+Cooling down system for 240 seconds... done. Temp: 47.0°C → 42.0°C
+Measuring idle baseline energy consumption (60 seconds)...
+✓ Idle baseline completed. Avg CPU Power: 2.64 W, Avg Cores Power: 0.68 W
+
+--- 📊 Data Analysis ---
+
+======================= BENCHMARK RESULTS (ecdsa-P-384) =======================
+
+Performance Metrics:
+   - Signing:      53923 ops in 60.00s -> 898.70 ops/sec
+   - Verification: 61602 ops in 60.00s -> 1026.69 ops/sec
+   - Ratio (Verify/Sign): 1.14x
+
+Raw Energy Metrics (Total):
+   - Signing (CPU):      364.16 J total, 6.753 mJ/op
+   - Verification (CPU): 357.39 J total, 5.802 mJ/op
+   - Idle (CPU):         158.33 J total (2.64 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Package, Idle-Subtracted):
+   - Signing:      3.817 mJ/op
+   - Verification: 3.231 mJ/op
+   - Energy Ratio (Sign/Verify): 1.18x
+
+Cores Energy Metrics:
+   - Signing (Cores):      242.01 J total, 4.488 mJ/op
+   - Verification (Cores): 238.29 J total, 3.868 mJ/op
+   - Idle (Cores):         40.79 J total (0.68 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Cores, Idle-Subtracted):
+   - Signing:      3.732 mJ/op
+   - Verification: 3.206 mJ/op
+   - Energy Ratio (Sign/Verify): 1.16x
+
+Output Files:
+   - Signing:      ecdsa/ecdsa_ECDSA_signing_20260118_064455.csv
+   - Verification: ecdsa/ecdsa_ECDSA_verification_20260118_065355.csv
+   - Idle:         ecdsa/ecdsa_ECDSA_idle_20260118_065855.csv
+====================================================================================
+
+Cleaning up resources...
+
+✅ Benchmark Complete.
+Log file closed.

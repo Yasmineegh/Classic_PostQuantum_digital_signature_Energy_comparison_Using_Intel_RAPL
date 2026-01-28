@@ -1,0 +1,76 @@
+Logging output to: dilithium/benchmark_log_dilithium_20260117_234828.txt
+🚀 Starting Power Consumption Benchmark for dilithium-Dilithium3 🚀
+
+============== System Information ==============
+Algorithm:              dilithium-Dilithium3
+Benchmark Duration:     60 seconds
+Process Priority:       SCHED_FIFO (real-time)
+================================================
+
+Validating RAPL domains...
+✓ RAPL domains validated.
+
+--- ⚙️ Prepare Test Data ---
+Generating keypair for Dilithium3...
+✓ Generated Dilithium3 keypair (SHAKE256) and 1000 random messages.
+Pre-computing 1000 signatures for verification benchmark...
+✓ Pre-computed 1000 signatures.
+
+--- ✏️ Signing Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 43.0°C → 41.0°C
+Starting signing warmup phase (240 seconds)...
+✓ signing warmup completed (1315539 ops). Temp: 41.0°C → 54.0°C (Δ13.0°C)
+Starting Dilithium3 signing benchmark (60 seconds)...
+✓ signing benchmark completed. Throughput: 5453.85 ops/sec
+
+--- ✔️ Verification Benchmark Run ---
+Cooling down system for 240 seconds... done. Temp: 47.0°C → 43.0°C
+Starting verification warmup phase (240 seconds)...
+✓ verification warmup completed (3448660 ops). Temp: 43.0°C → 53.0°C (Δ10.0°C)
+Starting Dilithium3 verification benchmark (60 seconds)...
+✓ verification benchmark completed. Throughput: 14325.82 ops/sec
+
+--- 💤 Measure Idle Baseline ---
+Cooling down system for 240 seconds... done. Temp: 49.0°C → 42.0°C
+Measuring idle baseline energy consumption (60 seconds)...
+✓ Idle baseline completed. Avg CPU Power: 2.83 W, Avg Cores Power: 0.68 W
+
+--- 📊 Data Analysis ---
+
+======================= BENCHMARK RESULTS (dilithium-Dilithium3) =======================
+
+Performance Metrics:
+   - Signing:      327233 ops in 60.00s -> 5453.85 ops/sec
+   - Verification: 859551 ops in 60.00s -> 14325.82 ops/sec
+   - Ratio (Verify/Sign): 2.63x
+
+Raw Energy Metrics (Total):
+   - Signing (CPU):      375.07 J total, 1.146 mJ/op
+   - Verification (CPU): 373.41 J total, 0.434 mJ/op
+   - Idle (CPU):         169.52 J total (2.83 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Package, Idle-Subtracted):
+   - Signing:      0.628 mJ/op
+   - Verification: 0.237 mJ/op
+   - Energy Ratio (Sign/Verify): 2.65x
+
+Cores Energy Metrics:
+   - Signing (Cores):      244.45 J total, 0.747 mJ/op
+   - Verification (Cores): 244.67 J total, 0.285 mJ/op
+   - Idle (Cores):         40.56 J total (0.68 W avg)
+
+⚡️ Dynamic Energy Analysis (CPU Cores, Idle-Subtracted):
+   - Signing:      0.623 mJ/op
+   - Verification: 0.237 mJ/op
+   - Energy Ratio (Sign/Verify): 2.62x
+
+Output Files:
+   - Signing:      dilithium/dilithium_Dilithium3_signing_20260117_235728.csv
+   - Verification: dilithium/dilithium_Dilithium3_verification_20260118_000628.csv
+   - Idle:         dilithium/dilithium_Dilithium3_idle_20260118_001128.csv
+====================================================================================
+
+Cleaning up resources...
+
+✅ Benchmark Complete.
+Log file closed.

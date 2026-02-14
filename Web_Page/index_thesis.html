@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptographic Benchmark Analyzer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles_updated.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cryptographic Benchmark Analyzer</h1>
+        
+        <div class="upload-section">
+            <h3>Upload Benchmark Files</h3>
+            <p>Select multiple benchmark log files to analyze performance and energy consumption</p>
+            <div class="file-input">
+                <label for="file-upload" class="file-label">Choose Files</label>
+                <input type="file" id="file-upload" multiple accept=".txt,.log">
+            </div>
+            <div class="file-list" id="file-list"></div>
+            <div class="button-group">
+                <button class="analyze-btn" id="analyze-btn" disabled onclick="analyzeFiles()">
+                    Analyze Benchmarks
+                </button>
+                <button class="clear-all-btn" id="clear-all-btn" disabled onclick="clearAllFiles()">
+                    Clear All Files
+                </button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing benchmark data...</p>
+        </div>
+        
+        <div class="analysis-section" id="analysis-section">
+            <div class="analysis-type" id="analysis-type"></div>
+            
+            <div class="export-controls" id="export-controls" style="display: none;">
+                <button class="export-btn" onclick="exportToPDF()">📄 Export to PDF</button>
+                <button class="export-btn" onclick="exportToCSV()">📊 Export to CSV</button>
+                <button class="scale-toggle" id="scale-toggle" onclick="toggleScale()">
+                    📈 Switch to Log Scale
+                </button>
+            </div>
+            
+            <div id="results-container"></div>
+        </div>
+    </div>
+
+    <script src="script_thesis.js"></script>
+</body>
+</html>

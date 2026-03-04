@@ -40,7 +40,7 @@ typedef struct {
     int num_messages;
 } benchmark_data_t;
 
-// Benchmark result structure - REMOVED UNCORE FIELDS
+// Benchmark result structure 
 typedef struct {
     double duration_sec;
     long operations_count;

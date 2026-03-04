@@ -13,6 +13,7 @@
 # - Dilithium: Dilithium2 (SHAKE256)
 # - Falcon: Falcon-512 (SHAKE256)
 # - SPHINCS+: SPHINCS+-SHA2-128f (SHA-256)
+# - SPHINCS+: SPHINCS+-SHA2-128s (SHA-256)
 #
 # Each algorithm runs 5 times in random order with 300s cooling between runs
 # Benchmarks run on isolated cores 1-2
@@ -511,7 +512,6 @@ System Optimizations Applied:
 - Intel Turbo Boost: Disabled
 - CPU Governor: Performance mode
 - IRQ Affinity: Moved to Core 0
-- Tuning Profile: latency-performance
 - ASLR: Disabled
 - NUMA Balancing: Disabled
 - RAPL Power Monitoring: Enabled
@@ -543,7 +543,7 @@ EOF
 
 Analysis Notes:
 ==============
-- All algorithms tested at NIST Security Level 1 (~128-bit equivalent)
+- All algorithms tested at NIST Security Level 1/2 (~128-bit equivalent)
 - Each algorithm ran 5 times in randomized order to minimize systematic bias
 - 300s cooling period between each run to ensure thermal stability
 - This is the baseline security level suitable for most applications
@@ -565,14 +565,6 @@ For detailed analysis, examine:
 - CSV files for raw performance and power data
 - Log files for complete benchmark output
 - Power monitoring data for energy consumption patterns
-
-Recommended Analysis:
-- Energy per operation comparison at baseline security level
-- Performance vs. security trade-offs at Level 1
-- Classical vs. post-quantum energy efficiency
-- Statistical analysis across 5 runs per algorithm
-- Impact of run order randomization on results
-- SPHINCS+ fast vs small variant: speed-size-energy trade-off analysis
 EOF
 
     success "Comprehensive summary report generated: $summary_file"

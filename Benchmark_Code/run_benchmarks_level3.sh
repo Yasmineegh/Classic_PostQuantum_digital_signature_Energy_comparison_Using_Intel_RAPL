@@ -498,7 +498,6 @@ System Optimizations Applied:
 - Intel Turbo Boost: Disabled
 - CPU Governor: Performance mode
 - IRQ Affinity: Moved to Core 0
-- Tuning Profile: latency-performance
 - ASLR: Disabled
 - NUMA Balancing: Disabled
 - RAPL Power Monitoring: Enabled
@@ -551,13 +550,7 @@ For detailed analysis, examine:
 - Log files for complete benchmark output
 - Power monitoring data for energy consumption patterns
 
-Recommended Analysis:
-- Energy per operation comparison at baseline security level
-- Performance vs. security trade-offs at Level 3
-- Classical vs. post-quantum energy efficiency
-- Statistical analysis across 5 runs per algorithm
-- Impact of run order randomization on results
-- SPHINCS+ fast vs small variant: speed-size-energy trade-off analysis
+
 EOF
 
     success "Comprehensive summary report generated: $summary_file"

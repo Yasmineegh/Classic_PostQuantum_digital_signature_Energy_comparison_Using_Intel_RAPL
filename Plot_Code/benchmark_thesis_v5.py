@@ -2,13 +2,6 @@
 """
 benchmark_thesis_v5_pub.py
 
-Thesis-ready plotting script (publication quality):
-- Throughput: Signing + Verification in ONE figure (linear + log)
-- Energy: Package and Cores separate, each includes Signing + Verification (linear + log)
-- Value labels ABOVE bars (no clipping) using bbox_extra_artists
-- Friendly number formatting (avoid scientific notation)
-- Vector outputs (PDF/SVG with embedded fonts) + ultra-high DPI PNG
-
 Run:
   py benchmark_thesis_v5_pub.py --input ./logs --out ./out --pattern "*.txt"
 
@@ -38,10 +31,45 @@ except Exception:
     student_t = None
     _HAVE_SCIPY = False
 
+# Publication-grade vector text (editable)
 mpl.rcParams["pdf.fonttype"] = 42
 mpl.rcParams["ps.fonttype"] = 42
 mpl.rcParams["svg.fonttype"] = "none"
 
+# ---------------------------------------------------------------------------
+# Algorithm family ordering
+# ---------------------------------------------------------------------------
+# Classical algorithms come first, then post-quantum (lattice-based, then hash-based).
+
+_FAMILY_ORDER: List[Tuple[str, int]] = [
+    # Classical
+    ("rsa",        0),
+    ("ecdsa",      1),
+    ("ecdsa",      1),
+    ("eddsa",      2),
+    ("ed25519",    2),
+    ("ed448",      2),
+    # Post-quantum – lattice
+    ("dilithium",  3),
+    ("falcon",     4),
+    # Post-quantum – hash-based
+    ("sphincs",    5),
+]
+
+def _family_sort_key(alg_name: str) -> Tuple[int, str]:
+    """Return (family_index, alg_name) so algorithms sort by family then name."""
+    lower = alg_name.lower()
+    for substring, idx in _FAMILY_ORDER:
+        if substring in lower:
+            return (idx, alg_name)
+    return (99, alg_name)  
+
+
+def _sort_algorithms(algs: List[str]) -> List[str]:
+    return sorted(algs, key=_family_sort_key)
+
+
+# ---------------------------------------------------------------------------
 
 @dataclass
 class RunMetrics:
@@ -153,7 +181,7 @@ def summarize_by_algorithm(df_runs: pd.DataFrame) -> pd.DataFrame:
         "verify_dyn_cores_mj_per_op",
     ]
     rows = []
-    for alg, g in df_runs.groupby("algorithm", sort=True):
+    for alg, g in df_runs.groupby("algorithm", sort=False):
         row = {"algorithm": alg, "runs": int(len(g))}
         for col in metrics:
             s = stats_mean_sd_ci(g[col].tolist())
@@ -163,7 +191,13 @@ def summarize_by_algorithm(df_runs: pd.DataFrame) -> pd.DataFrame:
             row[f"{col}__ci95"] = s["ci"]
             row[f"{col}__cv_pct"] = s["cv"]
         rows.append(row)
-    return pd.DataFrame(rows).sort_values("algorithm").reset_index(drop=True)
+
+    df = pd.DataFrame(rows)
+
+    df["_sort_key"] = df["algorithm"].apply(lambda a: _family_sort_key(a)[0])
+    df = df.sort_values(["_sort_key", "algorithm"]).drop(columns=["_sort_key"]).reset_index(drop=True)
+
+    return df
 
 
 def _format_cell(mean: float, sd: float, ci: float) -> str:
@@ -233,6 +267,47 @@ def _filter_for_log(
     return algs2, series2
 
 
+def _add_family_dividers(ax, algs: List[str], n_series: int, bar_w: float, total_width: float):
+    """Draw a subtle vertical divider between Classical and PQC algorithm groups."""
+    classical_end_idx = -1
+    for i, alg in enumerate(algs):
+        key = _family_sort_key(alg)[0]
+        if key <= 2: 
+            classical_end_idx = i
+
+    if 0 <= classical_end_idx < len(algs) - 1:
+        divider_x = classical_end_idx + 0.5
+        ymin, ymax = ax.get_ylim()
+        ax.axvline(
+            x=divider_x,
+            color="gray",
+            linewidth=1.0,
+            linestyle="--",
+            alpha=0.5,
+            zorder=0,
+        )
+        ax.text(
+            classical_end_idx / 2,
+            ymax * 0.97 if not ax.get_yscale() == "log" else ymax ** 0.97,
+            "Classical",
+            ha="center",
+            va="top",
+            fontsize=8,
+            color="gray",
+            style="italic",
+        )
+        ax.text(
+            (classical_end_idx + 1 + len(algs) - 1) / 2,
+            ymax * 0.97 if not ax.get_yscale() == "log" else ymax ** 0.97,
+            "Post-Quantum",
+            ha="center",
+            va="top",
+            fontsize=8,
+            color="gray",
+            style="italic",
+        )
+
+
 def plot_grouped_bars(
     algs_raw: List[str],
     series: List[Tuple[List[float], List[float], str]],
@@ -242,6 +317,8 @@ def plot_grouped_bars(
     log_scale: bool,
     label_values: bool,
 ):
+    algs_raw = _sort_algorithms(algs_raw)
+
     algs_wrapped = _wrap_labels(algs_raw, width=16)
 
     if log_scale:
@@ -265,10 +342,9 @@ def plot_grouped_bars(
             return ""
         return f"{v:.1f}"
 
-
     max_top = 0.0
     max_label_y = 0.0
-    extra_artists = []  
+    extra_artists = []
 
     for j, (means, sds, name) in enumerate(series):
         xs = [xi + offsets[j] for xi in x]
@@ -332,6 +408,8 @@ def plot_grouped_bars(
 
     if not log_scale and "ops/s" in ylabel:
         ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _p: f"{v:,.0f}"))
+
+    _add_family_dividers(ax, algs_wrapped, n_series, bar_w, total_width)
 
     for ext in [".pdf", ".svg"]:
         fig.savefig(
@@ -466,6 +544,7 @@ def main():
     print(f"Algorithms: {len(df_summary)}")
     print(f"Wrote outputs to: {out_dir}")
     print("Created thesis-ready grouped Signing vs Verification figures (linear + log) for throughput and energy.")
+    print("Algorithm order: RSA → ECDSA → EdDSA | Dilithium → Falcon → SPHINCS+")
 
 
 if __name__ == "__main__":

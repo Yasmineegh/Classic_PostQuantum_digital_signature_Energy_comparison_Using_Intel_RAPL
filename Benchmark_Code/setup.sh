@@ -70,8 +70,6 @@ echo "     IRQ affinity set."
 
 
 # --- 6. Disable Address Space Layout Randomization (ASLR) ---
-# Disabling ASLR improves the repeatability of performance tests by ensuring
-# code is loaded into the same memory locations on each run.
 # This setting reverts on reboot. To revert manually: echo 2 > /proc/sys/kernel/randomize_va_space
 echo "  -> Disabling Address Space Layout Randomization (ASLR)..."
 echo 0 > /proc/sys/kernel/randomize_va_space

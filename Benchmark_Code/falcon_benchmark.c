@@ -9,7 +9,6 @@ typedef struct {
 } oqs_context_t;
 
 // --- Generic OQS Implementation of the crypto_operations_t interface ---
-// This implementation is shared by Dilithium, Falcon, and SPHINCS+
 
 static int oqs_init_and_generate_data(benchmark_data_t *data, const char* variant) {
     oqs_context_t *ctx = malloc(sizeof(oqs_context_t));

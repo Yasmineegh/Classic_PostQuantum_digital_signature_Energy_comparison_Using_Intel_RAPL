@@ -38,7 +38,6 @@ except Exception:
     student_t = None
     _HAVE_SCIPY = False
 
-# Publication-grade vector text (editable)
 mpl.rcParams["pdf.fonttype"] = 42
 mpl.rcParams["ps.fonttype"] = 42
 mpl.rcParams["svg.fonttype"] = "none"
@@ -269,7 +268,7 @@ def plot_grouped_bars(
 
     max_top = 0.0
     max_label_y = 0.0
-    extra_artists = []  # critical: prevents bbox_inches="tight" from cropping labels
+    extra_artists = []  
 
     for j, (means, sds, name) in enumerate(series):
         xs = [xi + offsets[j] for xi in x]

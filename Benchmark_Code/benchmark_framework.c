@@ -287,13 +287,13 @@ static void analyze_results(benchmark_result_t *sign_result, benchmark_result_t 
             log_printf("   - Energy Ratio (Sign/Verify): %.2fx\n", dyn_energy_per_op_sign_mJ / dyn_energy_per_op_verify_mJ);
         }
         
-        // Add cores energy analysis
+        // cores energy analysis
         log_printf("\nCores Energy Metrics:\n");
         log_printf("   - Signing (Cores):      %.2f J total, %.3f mJ/op\n", sign_result->total_energy_cores_J, sign_result->energy_per_op_cores_mJ);
         log_printf("   - Verification (Cores): %.2f J total, %.3f mJ/op\n", verify_result->total_energy_cores_J, verify_result->energy_per_op_cores_mJ);
         log_printf("   - Idle (Cores):         %.2f J total (%.2f W avg)\n", idle_result->total_energy_cores_J, idle_result->avg_power_cores_W);
         
-        // Add dynamic cores energy analysis
+        //  dynamic cores energy analysis
         log_printf("\n⚡️ Dynamic Energy Analysis (CPU Cores, Idle-Subtracted):\n");
         double idle_power_cores_W = idle_result->avg_power_cores_W;
         double dynamic_energy_sign_cores_J = sign_result->total_energy_cores_J - (idle_power_cores_W * sign_result->duration_sec);

@@ -4,7 +4,7 @@
 #                   Disable Non-Essential Services for Benchmarking
 # ==============================================================================
 # This script disables common background services that can interfere with
-# performance measurements. Services will be re-enabled after benchmarking.
+# performance measurements. Script for re-enabling services is created.
 #
 # USAGE: sudo ./disable_services.sh
 #

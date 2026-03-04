@@ -163,13 +163,10 @@ function parseLogFile(content, filename) {
     const data = {
       filename: filename,
       algorithm: "",
-      // Throughput in ops/sec
       signing: {
         throughput: NaN,
-        // Raw energy (mJ/op) from "Raw Energy Metrics" (includes idle)
         energyPkg: NaN,
         energyCores: NaN,
-        // Idle-subtracted dynamic energy (mJ/op) from "Dynamic Energy Analysis"
         dynamicPkg: NaN,
         dynamicCores: NaN,
       },
@@ -251,7 +248,6 @@ function parseLogFile(content, filename) {
 
     // Basic validity guardrails:
     // - Require algorithm name
-    // - Require at least one parsed numeric metric (avoid treating missing parses as 0)
     if (!data.algorithm) return null;
 
     const hasAnyMetric =
@@ -287,16 +283,10 @@ function toggleScale() {
   }
 }
 
-/**
- * Thesis-friendly figure export:
- * - Exports a high-resolution PNG from a canvas (Chart.js renders to canvas).
- * - Default scale=4 typically yields a clean figure for 300dpi usage in LaTeX/Word.
- */
 function downloadCanvasPNG(canvasId, baseName, scale = 4) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
 
-  // White background (avoid transparent PNG in Word/LaTeX with dark page backgrounds)
   const w = canvas.width;
   const h = canvas.height;
 
@@ -465,7 +455,6 @@ function performComparisonAnalysis() {
     curr.verification.throughput > best.verification.throughput ? curr : best
   );
 
-  // Use CPU Package (idle-subtracted) as primary efficiency metric in the summary cards
   const mostEfficientPkg = comparisonData.reduce((best, curr) =>
     curr.signing.energyPkg + curr.verification.energyPkg <
     best.signing.energyPkg + best.verification.energyPkg
@@ -760,7 +749,6 @@ function calculateStabilityStats() {
 }
 
 function calculateMetricStats(values) {
-  // Filter out missing/invalid values (do NOT treat parse failures as 0)
   const clean = values.filter((v) => Number.isFinite(v));
   const n = clean.length;
 
@@ -778,7 +766,6 @@ function calculateMetricStats(values) {
 
   const mean = clean.reduce((sum, v) => sum + v, 0) / n;
 
-  // Sample variance (Bessel’s correction): divide by (n-1) when n>1
   let variance = 0;
   if (n > 1) {
     variance =
@@ -793,7 +780,6 @@ function calculateMetricStats(values) {
   const min = Math.min(...clean);
   const max = Math.max(...clean);
 
-  // 95% CI for the mean using t critical value (two-sided, alpha=0.05)
   const t = n > 1 ? tCritical95(n - 1) : NaN;
   const se = n > 1 ? stdDev / Math.sqrt(n) : NaN;
   const ci95 =
@@ -1315,7 +1301,6 @@ function exportToPDF() {
   );
   yPos += 12;
 
-  // Method note (thesis-friendly)
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
   doc.text(
@@ -1488,7 +1473,6 @@ function exportToPDF() {
     );
     yPos += 10;
 
-    // Energy
     doc.setFontSize(12);
     doc.setTextColor(40, 62, 81);
     doc.text("Energy per Operation (Idle-Subtracted)", 20, yPos);

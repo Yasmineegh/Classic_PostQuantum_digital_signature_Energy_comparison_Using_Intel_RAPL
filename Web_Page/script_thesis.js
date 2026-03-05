@@ -163,10 +163,13 @@ function parseLogFile(content, filename) {
     const data = {
       filename: filename,
       algorithm: "",
+      
       signing: {
         throughput: NaN,
+        
         energyPkg: NaN,
         energyCores: NaN,
+        
         dynamicPkg: NaN,
         dynamicCores: NaN,
       },
@@ -183,11 +186,11 @@ function parseLogFile(content, filename) {
       },
     };
 
-    // Algorithm name
+    
     const algMatch = content.match(/Algorithm:\s+(.+)/);
     if (algMatch) data.algorithm = algMatch[1].trim();
 
-    // Throughput
+    
     const signThroughputMatch = content.match(
       /Signing:\s+\d+\s+ops\s+in\s+[\d.]+s\s+->\s+([\d.]+)\s+ops\/sec/
     );
@@ -198,7 +201,7 @@ function parseLogFile(content, filename) {
     );
     if (verifyThroughputMatch) data.verification.throughput = parseFloat(verifyThroughputMatch[1]);
 
-    // Raw Energy Metrics (Total)
+    
     const signPkgEnergyMatch = content.match(
       /Signing\s+\(CPU\):\s+[\d.]+\s*J\s+total,\s*([\d.]+)\s*mJ\/op/
     );
@@ -219,7 +222,7 @@ function parseLogFile(content, filename) {
     );
     if (verifyCoresEnergyMatch) data.verification.energyCores = parseFloat(verifyCoresEnergyMatch[1]);
 
-    // Idle baseline average power
+    
     const idleMatch = content.match(
       /Idle\s+baseline\s+completed\.\s+Avg\s+CPU\s+Power:\s+([\d.]+)\s*W,\s+Avg\s+Cores\s+Power:\s+([\d.]+)\s*W/
     );
@@ -228,7 +231,7 @@ function parseLogFile(content, filename) {
       data.idle.avgCoresPowerW = parseFloat(idleMatch[2]);
     }
 
-    // Dynamic Energy Analysis (Idle-Subtracted): parse by section to avoid mixing Package and Cores
+    
     const pkgDynSection = content.match(
       /Dynamic\s+Energy\s+Analysis\s+\(CPU\s+Package,\s+Idle-Subtracted\):[\s\S]*?Signing:\s+([\d.]+)\s*mJ\/op[\s\S]*?Verification:\s+([\d.]+)\s*mJ\/op/
     );
@@ -245,9 +248,9 @@ function parseLogFile(content, filename) {
       data.verification.dynamicCores = parseFloat(coresDynSection[2]);
     }
 
-
-    // Basic validity guardrails:
-    // - Require algorithm name
+    
+    
+    
     if (!data.algorithm) return null;
 
     const hasAnyMetric =
@@ -287,6 +290,7 @@ function downloadCanvasPNG(canvasId, baseName, scale = 4) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
 
+  
   const w = canvas.width;
   const h = canvas.height;
 
@@ -455,6 +459,7 @@ function performComparisonAnalysis() {
     curr.verification.throughput > best.verification.throughput ? curr : best
   );
 
+  
   const mostEfficientPkg = comparisonData.reduce((best, curr) =>
     curr.signing.energyPkg + curr.verification.energyPkg <
     best.signing.energyPkg + best.verification.energyPkg
@@ -498,234 +503,309 @@ function createRecommendations(container, comparisonData) {
 
   let html = "<h3>🎯 Algorithm Recommendations</h3>";
 
-  const bestSigningPerf = comparisonData.reduce((best, curr) =>
-    curr.signing.throughput > best.signing.throughput ? curr : best
-  );
-  const bestVerifyPerf = comparisonData.reduce((best, curr) =>
-    curr.verification.throughput > best.verification.throughput ? curr : best
-  );
-  const bestSigningEnergy = comparisonData.reduce((best, curr) =>
-    curr.signing.energyPkg < best.signing.energyPkg ? curr : best
-  );
-  const bestVerifyEnergy = comparisonData.reduce((best, curr) =>
-    curr.verification.energyPkg < best.verification.energyPkg ? curr : best
-  );
-  const bestOverallEnergy = comparisonData.reduce((best, curr) =>
-    curr.signing.energyPkg + curr.verification.energyPkg <
-    best.signing.energyPkg + best.verification.energyPkg
-      ? curr
-      : best
-  );
-
-  const withScores = comparisonData.map((d) => ({
-    ...d,
-    balanceScore:
-      (d.signing.throughput + d.verification.throughput) /
-      (d.signing.energyPkg + d.verification.energyPkg),
-  }));
-  const bestBalanced = withScores.reduce((best, curr) =>
-    curr.balanceScore > best.balanceScore ? curr : best
-  );
-
-  if (bestSigningPerf.algorithm === bestSigningEnergy.algorithm) {
-    html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    🏆 Best for Frequent Signing (Key Generation)
-                    <span class="badge badge-balanced">OPTIMAL</span>
-                </div>
-                <div class="recommendation-text">
-                    <strong>${
-                      bestSigningPerf.algorithm
-                    }</strong> excels in both signing performance (${bestSigningPerf.signing.throughput.toFixed(
-      0
-    )} ops/sec) 
-                    and energy efficiency (${bestSigningPerf.signing.energyPkg.toFixed(
-                      3
-                    )} mJ/op). This is your go-to choice for applications 
-                    that require frequent key generation or signature creation, such as blockchain transactions, API authentication, 
-                    or certificate authorities.
-                </div>
-            </div>
-        `;
-  } else {
-    html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    ⚡ Best for Frequent Signing (Performance Priority)
-                    <span class="badge badge-performance">PERFORMANCE</span>
-                </div>
-                <div class="recommendation-text">
-                    <strong>${
-                      bestSigningPerf.algorithm
-                    }</strong> offers the highest signing throughput at ${bestSigningPerf.signing.throughput.toFixed(
-      0
-    )} ops/sec, 
-                    ideal for high-volume signing operations where speed is critical. Use this for time-sensitive applications like 
-                    real-time authentication systems or high-frequency trading platforms.
-                </div>
-            </div>
-        `;
-
-    html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    🌱 Best for Frequent Signing (Sustainability Priority)
-                    <span class="badge badge-energy">SUSTAINABLE</span>
-                </div>
-                <div class="recommendation-text">
-                    <strong>${
-                      bestSigningEnergy.algorithm
-                    }</strong> is the most energy-efficient for signing at ${bestSigningEnergy.signing.energyPkg.toFixed(
-      3
-    )} mJ/op, 
-                    making it ideal for battery-powered devices, IoT sensors, mobile applications, or data centers focused on reducing 
-                    carbon footprint. At scale, this can result in significant energy cost savings.
-                </div>
-            </div>
-        `;
+  function safeBest(arr, valueFn, lowerIsBetter = false) {
+    const valid = arr.filter((d) => Number.isFinite(valueFn(d)));
+    if (valid.length === 0) return null;
+    return valid.reduce((best, curr) => {
+      const bv = valueFn(best);
+      const cv = valueFn(curr);
+      return lowerIsBetter ? (cv < bv ? curr : best) : (cv > bv ? curr : best);
+    });
   }
 
-  if (bestVerifyPerf.algorithm === bestVerifyEnergy.algorithm) {
-    html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    🏆 Best for Frequent Verification
-                    <span class="badge badge-balanced">OPTIMAL</span>
-                </div>
-                <div class="recommendation-text">
-                    <strong>${
-                      bestVerifyPerf.algorithm
-                    }</strong> dominates verification with both top performance (${bestVerifyPerf.verification.throughput.toFixed(
-      0
-    )} ops/sec) 
-                    and efficiency (${bestVerifyPerf.verification.energyPkg.toFixed(
-                      3
-                    )} mJ/op). Perfect for scenarios with many signature 
-                    verifications such as software update validation, email authentication (DKIM), or distributed systems where 
-                    multiple nodes verify signatures.
-                </div>
-            </div>
-        `;
-  } else {
-    html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    ⚡ Best for Frequent Verification (Performance Priority)
-                    <span class="badge badge-performance">PERFORMANCE</span>
-                </div>
-                <div class="recommendation-text">
-                    <strong>${
-                      bestVerifyPerf.algorithm
-                    }</strong> provides the fastest verification at ${bestVerifyPerf.verification.throughput.toFixed(
-      0
-    )} ops/sec. 
-                    Excellent for systems that verify many signatures, such as package managers, code signing verification, 
-                    or TLS certificate validation in high-traffic web servers.
-                </div>
-            </div>
-        `;
-
-    html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    🌱 Best for Frequent Verification (Sustainability Priority)
-                    <span class="badge badge-energy">SUSTAINABLE</span>
-                </div>
-                <div class="recommendation-text">
-                    <strong>${
-                      bestVerifyEnergy.algorithm
-                    }</strong> uses only ${bestVerifyEnergy.verification.energyPkg.toFixed(
-      3
-    )} mJ/op for verification, 
-                    ideal for edge computing, CDN nodes, or any infrastructure that performs millions of verifications daily. 
-                    Lower energy consumption directly translates to reduced operational costs and environmental impact.
-                </div>
-            </div>
-        `;
+  function isNearTie(a, b, valueFn) {
+    if (!a || !b) return false;
+    const av = valueFn(a);
+    const bv = valueFn(b);
+    if (!Number.isFinite(av) || !Number.isFinite(bv) || av === 0) return false;
+    return Math.abs(av - bv) / Math.max(av, bv) < 0.05;
   }
 
-  html += `
-        <div class="recommendation-item">
-            <div class="recommendation-title">
-                🌍 Overall Sustainability Champion
-                <span class="badge badge-energy">ECO-FRIENDLY</span>
-            </div>
-            <div class="recommendation-text">
-                <strong>${
-                  bestOverallEnergy.algorithm
-                }</strong> has the lowest total energy consumption (${(
-    bestOverallEnergy.signing.energyPkg + bestOverallEnergy.verification.energyPkg
-  ).toFixed(3)} mJ/op combined). 
-                <br/>For reference (CPU cores only): ${(
-    bestOverallEnergy.signing.energyCores + bestOverallEnergy.verification.energyCores
-  ).toFixed(3)} mJ/op combined. 
-                This is the best choice for organizations prioritizing green computing, cloud providers optimizing for energy 
-                efficiency, or embedded systems where power consumption is critical. Over millions of operations, this can 
-                significantly reduce your carbon footprint and electricity costs.
-            </div>
-        </div>
-    `;
+  const bestSigningPerf   = safeBest(comparisonData, (d) => d.signing.throughput);
+  const bestVerifyPerf    = safeBest(comparisonData, (d) => d.verification.throughput);
+  const bestSigningEnergy = safeBest(comparisonData, (d) => d.signing.energyPkg, true);
+  const bestVerifyEnergy  = safeBest(comparisonData, (d) => d.verification.energyPkg, true);
+  const bestOverallEnergy = safeBest(
+    comparisonData,
+    (d) => d.signing.energyPkg + d.verification.energyPkg,
+    true
+  );
 
-  html += `
-        <div class="recommendation-item">
-            <div class="recommendation-title">
-                ⚖️ Best Balanced Choice
-                <span class="badge badge-balanced">VERSATILE</span>
-            </div>
-            <div class="recommendation-text">
-                <strong>${
-                  bestBalanced.algorithm
-                }</strong> offers the best performance-to-energy ratio (balance score: ${bestBalanced.balanceScore.toFixed(
-    2
-  )}). 
-                This is your all-around choice when you need good performance without excessive energy consumption. 
-                Ideal for general-purpose applications, microservices, or when you need a single algorithm that performs 
-                well across diverse workloads without specialized optimization.
-            </div>
-        </div>
-    `;
+  const withScores = comparisonData.map((d) => {
+    const totalThroughput = d.signing.throughput + d.verification.throughput;
+    const totalEnergy = d.signing.energyPkg + d.verification.energyPkg;
+    const balanceScore =
+      Number.isFinite(totalThroughput) && Number.isFinite(totalEnergy) && totalEnergy > 0
+        ? totalThroughput / totalEnergy
+        : NaN;
+    return { ...d, balanceScore };
+  });
+  const bestBalanced = safeBest(withScores, (d) => d.balanceScore);
 
-  const perfRange =
-    Math.max(...comparisonData.map((d) => d.signing.throughput)) /
-    Math.min(...comparisonData.map((d) => d.signing.throughput));
-  const energyRange =
-    Math.max(
-      ...comparisonData.map((d) => d.signing.energyPkg + d.verification.energyPkg)
-    ) /
-    Math.min(
-      ...comparisonData.map((d) => d.signing.energyPkg + d.verification.energyPkg)
+  if (bestSigningPerf && bestSigningEnergy) {
+    const signingTie = isNearTie(bestSigningPerf, bestSigningEnergy, (d) => d.signing.throughput)
+      || bestSigningPerf.algorithm === bestSigningEnergy.algorithm;
+
+    if (signingTie || bestSigningPerf.algorithm === bestSigningEnergy.algorithm) {
+      const tieNote = signingTie && bestSigningPerf.algorithm !== bestSigningEnergy.algorithm
+        ? ` (performance gap with ${bestSigningEnergy.algorithm} is within 5%)`
+        : "";
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            🏆 Best for Signing-Intensive Workloads
+            <span class="badge badge-balanced">OPTIMAL</span>
+          </div>
+          <div class="recommendation-text">
+            <strong>${bestSigningPerf.algorithm}</strong> leads in both signing throughput
+            (${bestSigningPerf.signing.throughput.toFixed(0)} ops/sec${tieNote}) and CPU Package
+            energy efficiency (${bestSigningPerf.signing.energyPkg.toFixed(3)} mJ/op).
+            It is the preferred choice for applications where signature generation is the dominant
+            operation, such as high-throughput authentication services or signing infrastructure.
+          </div>
+        </div>`;
+    } else {
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            ⚡ Best Signing Throughput
+            <span class="badge badge-performance">PERFORMANCE</span>
+          </div>
+          <div class="recommendation-text">
+            <strong>${bestSigningPerf.algorithm}</strong> achieves the highest signing throughput
+            at ${bestSigningPerf.signing.throughput.toFixed(0)} ops/sec. This makes it suitable
+            for latency-sensitive or high-volume signing workloads where throughput is the primary
+            constraint.
+          </div>
+        </div>`;
+
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            🌱 Most Energy-Efficient Signing
+            <span class="badge badge-energy">SUSTAINABLE</span>
+          </div>
+          <div class="recommendation-text">
+            <strong>${bestSigningEnergy.algorithm}</strong> consumes the least CPU Package energy
+            per signing operation (${bestSigningEnergy.signing.energyPkg.toFixed(3)} mJ/op).
+            This is advantageous for resource-constrained environments or deployments where energy
+            consumption is a key design constraint.
+          </div>
+        </div>`;
+    }
+  } else if (bestSigningPerf) {
+    html += `
+      <div class="recommendation-item">
+        <div class="recommendation-title">
+          ⚡ Best Signing Throughput
+          <span class="badge badge-performance">PERFORMANCE</span>
+        </div>
+        <div class="recommendation-text">
+          <strong>${bestSigningPerf.algorithm}</strong> achieves the highest signing throughput
+          at ${bestSigningPerf.signing.throughput.toFixed(0)} ops/sec.
+          Energy data was unavailable for a full efficiency comparison.
+        </div>
+      </div>`;
+  }
+
+  if (bestVerifyPerf && bestVerifyEnergy) {
+    const verifyTie = isNearTie(bestVerifyPerf, bestVerifyEnergy, (d) => d.verification.throughput)
+      || bestVerifyPerf.algorithm === bestVerifyEnergy.algorithm;
+
+    if (verifyTie || bestVerifyPerf.algorithm === bestVerifyEnergy.algorithm) {
+      const tieNote = verifyTie && bestVerifyPerf.algorithm !== bestVerifyEnergy.algorithm
+        ? ` (performance gap with ${bestVerifyEnergy.algorithm} is within 5%)`
+        : "";
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            🏆 Best for Verification-Intensive Workloads
+            <span class="badge badge-balanced">OPTIMAL</span>
+          </div>
+          <div class="recommendation-text">
+            <strong>${bestVerifyPerf.algorithm}</strong> leads in both verification throughput
+            (${bestVerifyPerf.verification.throughput.toFixed(0)} ops/sec${tieNote}) and CPU
+            Package energy efficiency (${bestVerifyPerf.verification.energyPkg.toFixed(3)} mJ/op).
+            It is the preferred choice for workloads dominated by signature verification, such as
+            distributed systems performing bulk signature validation.
+          </div>
+        </div>`;
+    } else {
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            ⚡ Best Verification Throughput
+            <span class="badge badge-performance">PERFORMANCE</span>
+          </div>
+          <div class="recommendation-text">
+            <strong>${bestVerifyPerf.algorithm}</strong> provides the highest verification
+            throughput at ${bestVerifyPerf.verification.throughput.toFixed(0)} ops/sec, making it
+            well-suited for systems where verification is the bottleneck operation.
+          </div>
+        </div>`;
+
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            🌱 Most Energy-Efficient Verification
+            <span class="badge badge-energy">SUSTAINABLE</span>
+          </div>
+          <div class="recommendation-text">
+            <strong>${bestVerifyEnergy.algorithm}</strong> uses the least CPU Package energy per
+            verification (${bestVerifyEnergy.verification.energyPkg.toFixed(3)} mJ/op), measured
+            as idle-subtracted dynamic energy. This is relevant for infrastructure performing
+            large volumes of verifications where energy budget is a constraint.
+          </div>
+        </div>`;
+    }
+  } else if (bestVerifyPerf) {
+    html += `
+      <div class="recommendation-item">
+        <div class="recommendation-title">
+          ⚡ Best Verification Throughput
+          <span class="badge badge-performance">PERFORMANCE</span>
+        </div>
+        <div class="recommendation-text">
+          <strong>${bestVerifyPerf.algorithm}</strong> provides the highest verification throughput
+          at ${bestVerifyPerf.verification.throughput.toFixed(0)} ops/sec.
+          Energy data was unavailable for a full efficiency comparison.
+        </div>
+      </div>`;
+  }
+
+  const PQC_PATTERNS = [/dilithium/i, /falcon/i, /sphincs/i];
+  const isPQC = (alg) => PQC_PATTERNS.some((re) => re.test(alg));
+  const pqcAlgorithms = comparisonData.filter((d) => isPQC(d.algorithm));
+  const classicalAlgorithms = comparisonData.filter((d) => !isPQC(d.algorithm));
+
+  if (pqcAlgorithms.length === 0) {
+    html += `
+      <div class="recommendation-item">
+        <div class="recommendation-title">
+          🔐 Quantum-Safe Recommendation
+          <span class="badge badge-balanced">POST-QUANTUM</span>
+        </div>
+        <div class="recommendation-text">
+          No post-quantum algorithm selected. To receive a quantum-safe recommendation,
+          include benchmark files for Dilithium, Falcon, or SPHINCS+.
+        </div>
+      </div>`;
+  } else {
+    const pqcWithScores = pqcAlgorithms.map((d) => {
+      const totalThroughput = d.signing.throughput + d.verification.throughput;
+      const totalEnergy = d.signing.energyPkg + d.verification.energyPkg;
+      const balanceScore =
+        Number.isFinite(totalThroughput) && Number.isFinite(totalEnergy) && totalEnergy > 0
+          ? totalThroughput / totalEnergy
+          : NaN;
+      return { ...d, balanceScore };
+    });
+    const bestPQC = safeBest(pqcWithScores, (d) => d.balanceScore);
+    const bestPQCEnergy = safeBest(
+      pqcAlgorithms,
+      (d) => d.signing.energyPkg + d.verification.energyPkg,
+      true
     );
 
-  if (perfRange > 2 || energyRange > 2) {
+    if (bestPQC) {
+      const classicalNote = classicalAlgorithms.length > 0
+        ? ` Classical algorithms present in this benchmark (${classicalAlgorithms.map((d) => d.algorithm).join(", ")}) do not provide security against quantum adversaries and should be avoided in threat models that include future quantum attacks.`
+        : "";
+      const energyNote = bestPQCEnergy && bestPQCEnergy.algorithm !== bestPQC.algorithm
+        ? `For deployments where energy is the primary constraint,
+           <strong>${bestPQCEnergy.algorithm}</strong> offers the lowest combined CPU Package
+           energy among the post-quantum candidates
+           (${(bestPQCEnergy.signing.energyPkg + bestPQCEnergy.verification.energyPkg).toFixed(3)} mJ/op).`
+        : `It also has the lowest combined CPU Package energy among the post-quantum candidates
+           (${(bestPQC.signing.energyPkg + bestPQC.verification.energyPkg).toFixed(3)} mJ/op).`;
+      html += `
+        <div class="recommendation-item">
+          <div class="recommendation-title">
+            🔐 Best Quantum-Safe Algorithm
+            <span class="badge badge-balanced">POST-QUANTUM</span>
+          </div>
+          <div class="recommendation-text">
+            Among the post-quantum algorithms in this benchmark,
+            <strong>${bestPQC.algorithm}</strong> achieves the best performance-to-energy ratio
+            (${Number.isFinite(bestPQC.balanceScore) ? bestPQC.balanceScore.toFixed(2) : "—"} ops/sec per mJ).
+            ${energyNote}
+            All three evaluated algorithms, Dilithium, Falcon, and SPHINCS+, are NIST
+            selected post-quantum algorithms and provide security against quantum computing attacks.${classicalNote}
+          </div>
+        </div>`;
+    }
+  }
+
+  if (bestOverallEnergy) {
+    const totalPkg   = bestOverallEnergy.signing.energyPkg + bestOverallEnergy.verification.energyPkg;
+    const totalCores = bestOverallEnergy.signing.energyCores + bestOverallEnergy.verification.energyCores;
+    const coresNote  = Number.isFinite(totalCores)
+      ? ` The CPU Cores domain (a subset of the Package domain, excluding uncore components) accounts for ${totalCores.toFixed(3)} mJ/op of this total.`
+      : "";
     html += `
-            <div class="recommendation-item">
-                <div class="recommendation-title">
-                    📊 Key Insights
-                </div>
-                <div class="recommendation-text">
-                    ${
-                      perfRange > 2
-                        ? `Performance varies significantly (${perfRange.toFixed(
-                            1
-                          )}x difference). `
-                        : ""
-                    }
-                    ${
-                      energyRange > 2
-                        ? `Energy consumption varies substantially (${energyRange.toFixed(
-                            1
-                          )}x difference). `
-                        : ""
-                    }
-                    ${
-                      perfRange > 2 && energyRange > 2
-                        ? "The choice of algorithm has major impact on both speed and sustainability. Consider your use case carefully!"
-                        : "Algorithm selection should be based on your specific workload characteristics."
-                    }
-                </div>
-            </div>
-        `;
+      <div class="recommendation-item">
+        <div class="recommendation-title">
+          🌍 Lowest Overall Energy Consumption
+          <span class="badge badge-energy">ECO-FRIENDLY</span>
+        </div>
+        <div class="recommendation-text">
+          <strong>${bestOverallEnergy.algorithm}</strong> has the lowest combined CPU Package
+          energy across signing and verification
+          (${Number.isFinite(totalPkg) ? totalPkg.toFixed(3) : "—"} mJ/op total, idle-subtracted).
+          CPU Package energy is reported as the primary metric as it captures the full socket power
+          draw, including uncore components.${coresNote}
+          This algorithm is preferable in deployments where minimising energy consumption is a
+          primary objective.
+        </div>
+      </div>`;
+  }
+
+  if (bestBalanced && Number.isFinite(bestBalanced.balanceScore)) {
+    html += `
+      <div class="recommendation-item">
+        <div class="recommendation-title">
+          ⚖️ Best Performance-to-Energy Ratio
+          <span class="badge badge-balanced">VERSATILE</span>
+        </div>
+        <div class="recommendation-text">
+          <strong>${bestBalanced.algorithm}</strong> achieves the best ratio of combined throughput
+          to combined CPU Package energy (score: ${bestBalanced.balanceScore.toFixed(2)} ops/sec per mJ).
+          This makes it a strong general-purpose candidate when neither raw throughput nor minimum
+          energy consumption alone drives the selection decision.
+        </div>
+      </div>`;
+  }
+
+  const signingThroughputs = comparisonData.map((d) => d.signing.throughput).filter(Number.isFinite);
+  const totalEnergies = comparisonData
+    .map((d) => d.signing.energyPkg + d.verification.energyPkg)
+    .filter(Number.isFinite);
+
+  const perfRange = signingThroughputs.length >= 2
+    ? Math.max(...signingThroughputs) / Math.min(...signingThroughputs)
+    : NaN;
+  const energyRange = totalEnergies.length >= 2
+    ? Math.max(...totalEnergies) / Math.min(...totalEnergies)
+    : NaN;
+
+  if ((Number.isFinite(perfRange) && perfRange > 2) || (Number.isFinite(energyRange) && energyRange > 2)) {
+    html += `
+      <div class="recommendation-item">
+        <div class="recommendation-title">
+          📊 Key Insights
+        </div>
+        <div class="recommendation-text">
+          ${Number.isFinite(perfRange) && perfRange > 2
+            ? `Signing throughput differs by up to ${perfRange.toFixed(1)}× across the evaluated algorithms. `
+            : ""}
+          ${Number.isFinite(energyRange) && energyRange > 2
+            ? `Total CPU Package energy consumption differs by up to ${energyRange.toFixed(1)}× across algorithms. `
+            : ""}
+          ${Number.isFinite(perfRange) && perfRange > 2 && Number.isFinite(energyRange) && energyRange > 2
+            ? "Algorithm choice has a substantial impact on both throughput and energy consumption; selection should be guided by the specific requirements of the target deployment."
+            : "Algorithm selection should account for the specific throughput and energy requirements of the target workload."}
+        </div>
+      </div>`;
   }
 
   recSection.innerHTML = html;
@@ -749,6 +829,7 @@ function calculateStabilityStats() {
 }
 
 function calculateMetricStats(values) {
+  
   const clean = values.filter((v) => Number.isFinite(v));
   const n = clean.length;
 
@@ -766,6 +847,7 @@ function calculateMetricStats(values) {
 
   const mean = clean.reduce((sum, v) => sum + v, 0) / n;
 
+  
   let variance = 0;
   if (n > 1) {
     variance =
@@ -780,6 +862,7 @@ function calculateMetricStats(values) {
   const min = Math.min(...clean);
   const max = Math.max(...clean);
 
+  
   const t = n > 1 ? tCritical95(n - 1) : NaN;
   const se = n > 1 ? stdDev / Math.sqrt(n) : NaN;
   const ci95 =
@@ -1301,6 +1384,7 @@ function exportToPDF() {
   );
   yPos += 12;
 
+  
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
   doc.text(
@@ -1446,7 +1530,7 @@ function exportToPDF() {
     doc.text(`Number of runs: ${n}`, 20, yPos);
     yPos += 10;
 
-    // Throughput
+    
     doc.setFontSize(12);
     doc.setTextColor(40, 62, 81);
     doc.text("Throughput", 20, yPos);
@@ -1473,6 +1557,7 @@ function exportToPDF() {
     );
     yPos += 10;
 
+    
     doc.setFontSize(12);
     doc.setTextColor(40, 62, 81);
     doc.text("Energy per Operation (Idle-Subtracted)", 20, yPos);
@@ -1519,7 +1604,6 @@ function exportToPDF() {
 
   doc.save(`crypto_benchmark_${currentAnalysisType}_${Date.now()}.pdf`);
 }
-
 
 function formatMeanSdCi(stats, decimals = 3) {
   if (!stats || !Number.isFinite(stats.mean)) return "—";
